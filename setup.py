@@ -10,22 +10,23 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 setup(
     name="themoviedb-lib",  # Required
     version="0.0.1",  # Required
-    description="",  # Optional
+    description="Library providing useful tools for The Movie Database (TMDb). Not dependent on API-keys.",  # Optional
     long_description=long_description,  # Optional
     long_description_content_type="text/markdown",  # Optional
     url="https://github.com/inwerk/themoviedb-lib",  # Optional
     author="",  # Optional
     author_email="",  # Optional
     classifiers=[  # Optional (https://pypi.org/classifiers/)
-        "Development Status :: 1 - Planning",
+        "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
-        "Topic :: Software Development :: Build Tools",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: 3 :: Only"
+        "Topic :: Software Development :: Build Tools"
     ],
-    keywords=["python", "development", "tmdb"],  # Optional
+    keywords=[  # Optional
+        "tmdb", "themoviedb", "the movie database", "the movie db",
+        "movie", "movies", "tv", "tv show", "tv shows"],
     packages=find_packages(),  # Required
     install_requires=['requests', 'beautifulsoup4', 'fake-useragent']  # Optional
 )
