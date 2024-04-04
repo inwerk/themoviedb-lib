@@ -125,12 +125,27 @@ class API:
         return categories
 
     @classmethod
-    def find(cls):
+    def poster_path(cls, poster_id: str, original_resolution: bool = True,
+                    width: int = None, height: int = None) -> str:
         """
-        TODO: method to find a specific movie or tv series
+        Returns the TMDb URL path for a poster image. Allowed sizes: 94x141, 188x282, 150x225, 300x450, 600x900.
+
+        :param poster_id: The poster ID.
+        :param original_resolution: Whether to return the path for the original resolution of the image.
+        :param width: The width of the image.
+        :param height: The height of the image.
+        :return: Poster path as string.
         """
 
-        raise NotImplementedError()
+        if original_resolution and width is None and height is None:
+            return f"/t/p/original/{poster_id}.jpg"
+
+        if not any([width == 94 and height == 141, width == 188 and height == 282, width == 150 and height == 225,
+                    width == 300 and height == 450, width == 600 and height == 900]):
+
+            raise ValueError("Image size not supported.")
+
+        return f"/t/p/w{width}_and_h{height}_bestv2/{poster_id}.jpg"
 
     @classmethod
     def __search_results(cls, html_page: BeautifulSoup, language: str) -> list:
@@ -194,18 +209,34 @@ class API:
 
     class Movie:
         @classmethod
-        def poster_path(cls):
+        def details(cls):
             """
-            TODO: method to get the poster_path for a specific movie
+            TODO: method to get information for a specific movie
+            """
+
+            raise NotImplementedError()
+
+        @classmethod
+        def poster_id(cls):
+            """
+            TODO: method to get the poster_id for a specific movie
             """
 
             raise NotImplementedError()
 
     class TV:
         @classmethod
-        def poster_path(cls):
+        def details(cls):
             """
-            TODO: method to get the poster_path for a specific tv series
+            TODO: method to get information for a specific tv series
+            """
+
+            raise NotImplementedError()
+
+        @classmethod
+        def poster_id(cls):
+            """
+            TODO: method to get the poster_id for a specific tv series
             """
 
             raise NotImplementedError()
@@ -232,8 +263,16 @@ class API:
             return seasons
 
         @classmethod
-        def number_of_seasons(cls):
-            raise NotImplementedError()
+        def number_of_seasons(cls, series_id: str) -> int:
+            # get seasons for the tv show
+            seasons = API.TV.seasons(series_id=series_id)
+
+            # remove season '0'
+            if "0" in seasons:
+                seasons.remove("0")
+
+            # return season count
+            return len(seasons)
 
         @classmethod
         @cache
@@ -417,14 +456,11 @@ class TMDbEntry:
 
         return self.category == "tv"
 
-    def __poster_path(self, width: int, height: int) -> str:
-        return f"/t/p/w{width}_and_h{height}_bestv2/{self.poster_id}.jpg"
-
-    def poster(self, resolution: str = "low", high_resolution: bool = False) -> Optional[io.BytesIO]:
+    def poster(self, resolution: str = "original", high_resolution: bool = False) -> Optional[io.BytesIO]:
         """
         Returns the poster of this TMDbEntry. By default, with a resolution of 94x141.
 
-        :param resolution: Specify the desired resolution for the image (e.g. 'low', 'medium', 'high').
+        :param resolution: Specify the desired resolution for the image (e.g. 'original', 'low', 'medium' or 'high').
         :parameter high_resolution: Specify whether the image should be returned in a higher resolution (600x900).
         :return: Poster image.
         """
@@ -432,32 +468,20 @@ class TMDbEntry:
         if self.poster_id is None:
             return None
 
-        if resolution != "low" and resolution != "medium" and resolution != "high":
-            raise ValueError("Specified resolution must be 'low', 'medium' or 'high'.")
-
         if high_resolution:
             resolution = "high"
 
-        if resolution == "low":
-            return Request.image(file_path=self.__poster_path(width=94, height=141))
-
-        if resolution == "medium":
-            return Request.image(file_path=self.__poster_path(width=188, height=282))
-
-        if resolution == "high":
-            return Request.image(file_path=self.__poster_path(width=600, height=900))
-
-    def get_poster(self, high_resolution: bool = False):
-        """
-        TODO: REMOVE THIS METHOD. NOW CALLABLE AS TMDbEntry.poster().\n
-
-        Returns the poster of this TMDbEntry. By default, with a resolution of 94x141.
-
-        :parameter high_resolution: Specify whether the image should be returned in a higher resolution (600x900).
-        :return: Poster image.
-        """
-
-        raise Exception("get_poster() HAS BEEN REMOVED. PLEASE USE TMDbEntry.poster().")
+        match resolution:
+            case "original":
+                return Request.image(file_path=API.poster_path(poster_id=self.poster_id, original_resolution=True))
+            case "low":
+                return Request.image(file_path=API.poster_path(poster_id=self.poster_id, width=150, height=225))
+            case "medium":
+                return Request.image(file_path=API.poster_path(poster_id=self.poster_id, width=300, height=450))
+            case "high":
+                return Request.image(file_path=API.poster_path(poster_id=self.poster_id, width=600, height=900))
+            case _:
+                raise ValueError("Specified resolution must be 'low', 'medium', 'high' or 'original'.")
 
     def seasons(self) -> list:
         """
@@ -485,15 +509,3 @@ class TMDbEntry:
             raise Exception(f"TMDbEntry is not a TV series. Category: {self.category}")
 
         return API.TV.episodes(series_id=self.tmdb_id, season_id=season_id, language=self.language)
-
-    def season(self, season_id: str) -> dict:
-        """
-        TODO: REMOVE THIS METHOD. NOW CALLABLE AS TMDbEntry.episodes().\n
-
-        Returns a dictionary mapping all the episodes for a specific season.
-
-        :param season_id: The season id.
-        :return: Dictionary mapping the season´s episodes.
-        """
-
-        raise Exception("season() HAS BEEN REMOVED. PLEASE USE TMDbEntry.episodes().")

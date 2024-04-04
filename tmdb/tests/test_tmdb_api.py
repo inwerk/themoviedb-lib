@@ -75,6 +75,70 @@ class TestTMDbAPI(unittest.TestCase):
 
         self.assertEqual(episodes_reference, episodes)
 
+    # tests for poster_path()
+    def test_poster_path_original(self):
+        poster_id = "mqGTDn6c5wy4Bwf6DR7eZeO7c5d"
+
+        poster_path = API.poster_path(poster_id=poster_id, original_resolution=True)
+
+        self.assertEqual(f"/t/p/original/{poster_id}.jpg", poster_path)
+
+    def test_poster_path_94x141(self):
+        poster_id = "mqGTDn6c5wy4Bwf6DR7eZeO7c5d"
+        width = 94
+        height = 141
+
+        poster_path = API.poster_path(poster_id=poster_id, width=width, height=height)
+
+        self.assertEqual(f"/t/p/w{width}_and_h{height}_bestv2/{poster_id}.jpg", poster_path)
+
+    def test_poster_path_188x282(self):
+        poster_id = "mqGTDn6c5wy4Bwf6DR7eZeO7c5d"
+        width = 188
+        height = 282
+
+        poster_path = API.poster_path(poster_id=poster_id, width=width, height=height)
+
+        self.assertEqual(f"/t/p/w{width}_and_h{height}_bestv2/{poster_id}.jpg", poster_path)
+
+    def test_poster_path_150x225(self):
+        poster_id = "mqGTDn6c5wy4Bwf6DR7eZeO7c5d"
+        width = 150
+        height = 225
+
+        poster_path = API.poster_path(poster_id=poster_id, width=width, height=height)
+
+        self.assertEqual(f"/t/p/w{width}_and_h{height}_bestv2/{poster_id}.jpg", poster_path)
+
+    def test_poster_path_300x450(self):
+        poster_id = "mqGTDn6c5wy4Bwf6DR7eZeO7c5d"
+        width = 300
+        height = 450
+
+        poster_path = API.poster_path(poster_id=poster_id, width=width, height=height)
+
+        self.assertEqual(f"/t/p/w{width}_and_h{height}_bestv2/{poster_id}.jpg", poster_path)
+
+    def test_poster_path_600x900(self):
+        poster_id = "mqGTDn6c5wy4Bwf6DR7eZeO7c5d"
+        width = 600
+        height = 900
+
+        poster_path = API.poster_path(poster_id=poster_id, width=width, height=height)
+
+        self.assertEqual(f"/t/p/w{width}_and_h{height}_bestv2/{poster_id}.jpg", poster_path)
+
+    def test_poster_path_invalid_size(self):
+        poster_id = "mqGTDn6c5wy4Bwf6DR7eZeO7c5d"
+        width = 1000
+        height = 2000
+
+        self.assertRaises(ValueError, lambda: API.poster_path(poster_id=poster_id, width=width, height=height))
+
+    # tests for TV.number_of_seasons()
+    def test_number_of_seasons(self):
+        self.assertEqual(3, API.TV.number_of_seasons(series_id=253))
+
 
 if __name__ == '__main__':
     unittest.main()

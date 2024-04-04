@@ -265,6 +265,11 @@ class TestTMDbEntry(unittest.TestCase):
 
         self.assertIsInstance(tmdb_entry.poster(resolution="high"), io.BytesIO)
 
+    def test_poster_original_resolution(self):
+        tmdb_entry = TMDbEntry(poster_id="mqGTDn6c5wy4Bwf6DR7eZeO7c5d")
+
+        self.assertIsInstance(tmdb_entry.poster(resolution="original"), io.BytesIO)
+
     def test_poster_poster_id_is_none(self):
         tmdb_entry = TMDbEntry(poster_id=None)
 
