@@ -137,7 +137,7 @@ class TestTMDbAPI(unittest.TestCase):
 
     # tests for TV.number_of_seasons()
     def test_number_of_seasons(self):
-        self.assertEqual(3, API.TV.number_of_seasons(series_id=253))
+        self.assertEqual(3, API.TV.number_of_seasons(series_id="253"))
 
 
 if __name__ == '__main__':

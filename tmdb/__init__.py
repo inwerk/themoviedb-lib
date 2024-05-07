@@ -164,8 +164,9 @@ class API:
             if div_title.find('h2') is not None:
                 tmdb_entry.title = div_title.find('h2').get_text().replace('amp;', '')
 
-            if div_title.find('span') is not None:
-                tmdb_entry.release_year = re.search(r'(\d){4}', div_title.find('span').get_text()).group()
+            if div_title.find('span', {'class': 'release_date'}) is not None:
+                tmdb_entry.release_year = re.search(r'(\d){4}', div_title
+                                                    .find('span', {'class': 'release_date'}).get_text()).group()
 
             if div_card.find('p') is not None:
                 tmdb_entry.description = div_card.find('p').get_text()
