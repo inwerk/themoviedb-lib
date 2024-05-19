@@ -162,7 +162,7 @@ class API:
                 tmdb_entry.tmdb_id = re.search(r'(\d+)', div_title.find('a').get('href')).group()
 
             if div_title.find('h2') is not None:
-                tmdb_entry.title = div_title.find('h2').get_text().replace('amp;', '')
+                result.title = div_title.find('h2').next_element.strip().replace('amp;', '')
 
             if div_title.find('span', {'class': 'release_date'}) is not None:
                 tmdb_entry.release_year = re.search(r'(\d){4}', div_title
